@@ -131,6 +131,53 @@ export function AdminCoursesPage() {
     setAdminState((current) => ({ ...current, lessons: [...current.lessons, newLesson] }))
     setLessonForms((current) => ({ ...current, [moduleId]: { title: '', type: 'Reading', content: '' } }))
   }
+  const addActivity = (courseId: string) => {
+  const draft = activityForms[courseId]
+
+  if (!draft?.title.trim()) return
+
+  if (draft.type === 'Assignment') {
+    const newAssignment: Assignment = {
+      id: createId('assignment'),
+      title: draft.title.trim(),
+      courseId,
+      deadline: draft.date,
+      instructions: 'Add assignment instructions.',
+      status: 'Draft',
+    }
+
+    setAdminState((current) => ({
+      ...current,
+      assignments: [...current.assignments, newAssignment],
+    }))
+  }
+
+  if (draft.type === 'Quiz') {
+    const newAssessment: Assessment = {
+      id: createId('assessment'),
+      courseId,
+      title: draft.title.trim(),
+      type: 'Quiz',
+      date: draft.date,
+      dueDate: draft.date,
+      graded: false,
+    }
+
+    setAdminState((current) => ({
+      ...current,
+      assessments: [...current.assessments, newAssessment],
+    }))
+  }
+
+  setActivityForms((current) => ({
+    ...current,
+    [courseId]: {
+      type: 'Assignment',
+      title: '',
+      date: '',
+    },
+  }))
+}
 
   const removeCourse = (courseId: string) => {
     setAdminState((current) => ({
@@ -296,6 +343,82 @@ export function AdminCoursesPage() {
                   {editingModuleId ? <Button variant="ghost" type="button" onClick={() => { setEditingModuleId(null); setModuleForms((current) => ({ ...current, [course.id]: { title: '', resources: '' } })) }}>Cancel</Button> : null}
                   <Button variant="primary" type="button" onClick={() => addModule(course.id)}>{editingModuleId ? 'Save module' : 'Add module'}</Button>
                 </div>
+              </div>
+                            <div className="card-stack" style={{ marginTop: 12 }}>
+                <h4>Learning activities</h4>
+
+                <label>
+                  Activity type
+                  <select
+                    value={activityForms[course.id]?.type ?? 'Assignment'}
+                    onChange={(event) =>
+                      setActivityForms((current) => ({
+                        ...current,
+                        [course.id]: {
+                          ...(current[course.id] ?? {
+                            type: 'Assignment',
+                            title: '',
+                            date: '',
+                          }),
+                          type: event.target.value as 'Quiz' | 'Assignment',
+                        },
+                      }))
+                    }
+                  >
+                    <option value="Assignment">Assignment</option>
+                    <option value="Quiz">Quiz</option>
+                  </select>
+                </label>
+
+                <label>
+                  Activity title
+                  <input
+                    value={activityForms[course.id]?.title ?? ''}
+                    onChange={(event) =>
+                      setActivityForms((current) => ({
+                        ...current,
+                        [course.id]: {
+                          ...(current[course.id] ?? {
+                            type: 'Assignment',
+                            title: '',
+                            date: '',
+                          }),
+                          title: event.target.value,
+                        },
+                      }))
+                    }
+                    placeholder="Assignment or quiz title"
+                  />
+                </label>
+
+                <label>
+                  Date
+                  <input
+                    type="date"
+                    value={activityForms[course.id]?.date ?? ''}
+                    onChange={(event) =>
+                      setActivityForms((current) => ({
+                        ...current,
+                        [course.id]: {
+                          ...(current[course.id] ?? {
+                            type: 'Assignment',
+                            title: '',
+                            date: '',
+                          }),
+                          date: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </label>
+
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => addActivity(course.id)}
+                >
+                  Add activity
+                </Button>
               </div>
             </Card>
           )
