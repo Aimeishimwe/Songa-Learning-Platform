@@ -1,28 +1,7 @@
+import { Award, BookOpen, BriefcaseBusiness, Mail, Sparkles } from 'lucide-react'
 import { PageShell } from '../components/PageShell'
 import { useAuth } from '../context/AuthContext'
-import { Card, Avatar } from '../components/ui'
+import { Avatar } from '../components/ui'
 import { usePageView } from '../hooks/usePageView'
 
-export function ProfilePage() {
-  const { user, role } = useAuth()
-  usePageView('Profile')
-
-  return (
-    <PageShell title="Profile" subtitle={role === 'mentor' ? 'Your mentoring profile and assigned learning area.' : role === 'admin' ? 'Your platform administration profile.' : 'Your learning profile and current journey.'}>
-      <div className="card-stack">
-        <Card>
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <Avatar name={user?.name} />
-            <div>
-              <h3>{user?.name ?? 'Aime Uwase'}</h3>
-              <p>{user?.email ?? 'scholar@songa.org'}</p>
-            </div>
-          </div>
-          <div style={{ marginTop: 12 }}>
-            {role === 'mentor' ? <><p><strong>Area of expertise:</strong> {user?.expertise ?? 'Not set'}</p><p><strong>Assigned course:</strong> {user?.assignedCourse ?? 'Not assigned'}</p></> : role === 'admin' ? <p><strong>Role:</strong> Platform administrator</p> : <><p><strong>Program:</strong> {user?.program ?? 'Songa Girls Initiative'}</p><p><strong>Academy:</strong> {user?.academy ?? 'Tech Sisters'}</p><p><strong>Current course:</strong> {user?.course ?? 'Front-End Web Development'}</p></>}
-          </div>
-        </Card>
-      </div>
-    </PageShell>
-  )
-}
+export function ProfilePage() { const { user, role } = useAuth(); usePageView('Profile'); const name = user?.name ?? 'Aime Uwase'; const isMentor = role === 'mentor'; const isAdmin = role === 'admin'; return <PageShell title="Profile" subtitle={isMentor ? 'The expertise and care you bring to every learner.' : isAdmin ? 'Leading the platform that powers a generation of growth.' : 'A clear picture of the learner you are becoming.'}><section className="profile-hero"><div className="profile-hero-pattern"><Sparkles /></div><div className="profile-main"><Avatar name={name} /><div><span className="profile-role">{isMentor ? 'Songa Mentor' : isAdmin ? 'Platform Administrator' : 'Songa Scholar'}</span><h2>{name}</h2><p><Mail size={15} /> {user?.email ?? 'scholar@songa.org'}</p></div></div></section><div className="profile-detail-grid"><article><div className="profile-detail-icon"><BriefcaseBusiness size={21} /></div><p className="eyebrow">Your space</p><h3>{isMentor ? user?.expertise ?? 'Learning Mentor' : isAdmin ? 'Songa Academy' : user?.program ?? 'Songa Girls Initiative'}</h3><p>{isMentor ? 'Helping learners turn curiosity into capability.' : isAdmin ? 'Guiding a growing digital campus.' : user?.academy ?? 'Tech Sisters'}</p></article><article><div className="profile-detail-icon gold"><BookOpen size={21} /></div><p className="eyebrow">Current focus</p><h3>{isMentor ? user?.assignedCourse ?? 'Course support' : isAdmin ? 'Platform excellence' : user?.course ?? 'Front-End Web Development'}</h3><p>{isMentor ? 'Supporting every learner’s next step.' : 'Building skills for a future you choose.'}</p></article><article><div className="profile-detail-icon green"><Award size={21} /></div><p className="eyebrow">Songa journey</p><h3>{isMentor ? 'Community guide' : isAdmin ? 'Mission steward' : 'Active learner'}</h3><p>Showing up with purpose, one step at a time.</p></article></div></PageShell> }

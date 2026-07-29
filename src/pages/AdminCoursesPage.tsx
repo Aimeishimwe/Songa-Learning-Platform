@@ -50,10 +50,10 @@ function createId(prefix: string) {
 export function AdminCoursesPage() {
   const { activeProgram } = useProgramContext()
   const [adminState, setAdminState] = useState<AdminCourseState>(() => loadAdminCourseState())
-  const [courseForm, setCourseForm] = useState({ name: '', description: '', academy: '', mentor: '', duration: '' })
+  const [courseForm, setCourseForm] = useState({ name: '', description: '', academy: '', mentor: '', duration: '', coverImage: '' })
   const [moduleForms, setModuleForms] = useState<Record<string, { title: string; resources: string }>>({})
-  const [lessonForms, setLessonForms] = useState<Record<string, { title: string; type: Lesson['type']; content: string }>>({})
-  const [activityForms, setActivityForms] = useState<Record<string, { type: 'Quiz' | 'Assignment'; title: string; date: string }>>({})
+  const [lessonForms, setLessonForms] = useState<Record<string, { title: string; type: Lesson['type']; content: string; videoUrl: string; materialUrl: string; attachmentName: string }>>({})
+  const [activityForms, setActivityForms] = useState<Record<string, { type: 'Quiz' | 'Assignment'; title: string; date: string; moduleId: string; instructions: string }>>({})
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -77,10 +77,11 @@ export function AdminCoursesPage() {
       progress: 0,
       status: 'Active',
       modules: [],
+      coverImage: courseForm.coverImage,
     }
 
     setAdminState((current) => ({ ...current, courses: [...current.courses, newCourse] }))
-    setCourseForm({ name: '', description: '', academy: '', mentor: '', duration: '' })
+    setCourseForm({ name: '', description: '', academy: '', mentor: '', duration: '', coverImage: '' })
   }
 
   const addModule = (courseId: string) => {
@@ -126,10 +127,13 @@ export function AdminCoursesPage() {
       title: draft.title.trim(),
       type: draft.type,
       content: draft.content.trim() || 'Add notes for this learning section.',
+      videoUrl: draft.videoUrl.trim() || undefined,
+      materialUrl: draft.materialUrl || undefined,
+      attachmentName: draft.attachmentName || undefined,
     }
 
     setAdminState((current) => ({ ...current, lessons: [...current.lessons, newLesson] }))
-    setLessonForms((current) => ({ ...current, [moduleId]: { title: '', type: 'Reading', content: '' } }))
+    setLessonForms((current) => ({ ...current, [moduleId]: { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' } }))
   }
   const addActivity = (courseId: string) => {
   const draft = activityForms[courseId]
@@ -142,13 +146,14 @@ export function AdminCoursesPage() {
       title: draft.title.trim(),
       courseId,
       deadline: draft.date,
-      instructions: 'Add assignment instructions.',
+      instructions: draft.instructions.trim() || 'Add assignment instructions.',
       status: 'Draft',
     }
 
     setAdminState((current) => ({
       ...current,
       assignments: [...current.assignments, newAssignment],
+      modules: current.modules.map((module) => module.id === draft.moduleId ? { ...module, assignmentId: newAssignment.id } : module),
     }))
   }
 
@@ -166,6 +171,7 @@ export function AdminCoursesPage() {
     setAdminState((current) => ({
       ...current,
       assessments: [...current.assessments, newAssessment],
+      modules: current.modules.map((module) => module.id === draft.moduleId ? { ...module, quizId: newAssessment.id } : module),
     }))
   }
 
@@ -174,7 +180,7 @@ export function AdminCoursesPage() {
     [courseId]: {
       type: 'Assignment',
       title: '',
-      date: '',
+      date: '', moduleId: '', instructions: '',
     },
   }))
 }
@@ -241,6 +247,8 @@ export function AdminCoursesPage() {
             Duration
             <input value={courseForm.duration} onChange={(event) => setCourseForm((current) => ({ ...current, duration: event.target.value }))} placeholder="4 weeks" />
           </label>
+          <label>Course cover image URL<input value={courseForm.coverImage} onChange={(event) => setCourseForm((current) => ({ ...current, coverImage: event.target.value }))} placeholder="https://..." /></label>
+          <label>Or upload a cover image<input type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => setCourseForm((current) => ({ ...current, coverImage: String(reader.result) })); reader.readAsDataURL(file) }} /></label>
           <Button variant="primary" type="submit">Save course</Button>
         </form>
       </Card>
@@ -258,6 +266,7 @@ export function AdminCoursesPage() {
                 <Button variant="ghost" type="button" onClick={() => removeCourse(course.id)}>Delete</Button>
               </div>
               <p>{course.description}</p>
+              {course.coverImage ? <img className="admin-course-cover" src={course.coverImage} alt={`${course.name} cover`} /> : null}
               <p className="muted-text">Academy: {course.academy} • Mentor: {course.mentor} • Duration: {course.duration}</p>
 
               <div className="card-stack" style={{ marginTop: 12 }}>
@@ -286,19 +295,20 @@ export function AdminCoursesPage() {
                         )) : <p className="muted-text">No lessons yet.</p>}
                       </div>
                       <div className="card-stack" style={{ marginTop: 8 }}>
+                        <div className="admin-lesson-builder-heading"><div><p className="eyebrow">Lessons in this module</p><h4>Create a lesson for {module.title}</h4></div><span>Module {module.number}</span></div>
                         <label>
-                          Add a lesson
+                          Lesson title
                           <input
                             value={lessonForms[module.id]?.title ?? ''}
-                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '' }), title: event.target.value } }))}
-                            placeholder="Lesson title"
+                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), title: event.target.value } }))}
+                            placeholder="e.g. What is HTML?"
                           />
                         </label>
                         <label>
                           Lesson type
                           <select
                             value={lessonForms[module.id]?.type ?? 'Reading'}
-                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '' }), type: event.target.value as Lesson['type'] } }))}
+                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), type: event.target.value as Lesson['type'] } }))}
                           >
                             <option value="Video">Video</option>
                             <option value="Reading">Reading</option>
@@ -311,11 +321,13 @@ export function AdminCoursesPage() {
                           <textarea
                             rows={2}
                             value={lessonForms[module.id]?.content ?? ''}
-                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '' }), content: event.target.value } }))}
-                            placeholder="A short summary or task"
+                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), content: event.target.value } }))}
+                            placeholder="Write the lesson content or instructions"
                           />
                         </label>
-                        <Button variant="secondary" type="button" onClick={() => addLesson(module.id)}>Add lesson</Button>
+                        <label>Video link (optional)<input value={lessonForms[module.id]?.videoUrl ?? ''} onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), videoUrl: event.target.value } }))} placeholder="https://youtube.com/..." /></label>
+                        <label>Supporting material (optional)<input type="file" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), materialUrl: String(reader.result), attachmentName: file.name } })); reader.readAsDataURL(file) }} /></label>
+                        <Button variant="secondary" type="button" onClick={() => addLesson(module.id)}>Create lesson in this module</Button>
                       </div>
                     </div>
                   )
@@ -356,9 +368,7 @@ export function AdminCoursesPage() {
                         ...current,
                         [course.id]: {
                           ...(current[course.id] ?? {
-                            type: 'Assignment',
-                            title: '',
-                            date: '',
+                            type: 'Assignment', title: '', date: '', moduleId: '', instructions: '',
                           }),
                           type: event.target.value as 'Quiz' | 'Assignment',
                         },
@@ -379,9 +389,7 @@ export function AdminCoursesPage() {
                         ...current,
                         [course.id]: {
                           ...(current[course.id] ?? {
-                            type: 'Assignment',
-                            title: '',
-                            date: '',
+                            type: 'Assignment', title: '', date: '', moduleId: '', instructions: '',
                           }),
                           title: event.target.value,
                         },
@@ -411,6 +419,8 @@ export function AdminCoursesPage() {
                     }
                   />
                 </label>
+                <label>Place inside module<select value={activityForms[course.id]?.moduleId ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', instructions: '' }), moduleId: event.target.value } }))}><option value="">Choose a module</option>{courseModules.map((module) => <option key={module.id} value={module.id}>Module {module.number}: {module.title}</option>)}</select></label>
+                <label>Instructions<textarea rows={3} value={activityForms[course.id]?.instructions ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', moduleId: '' }), instructions: event.target.value } }))} placeholder="What should scholars do?" /></label>
 
                 <Button
                   variant="secondary"

@@ -6,11 +6,12 @@ import { usePageView } from '../hooks/usePageView'
 import { Card, Skeleton } from '../components/ui'
 import { CourseOverviewCard } from '../components/learning'
 import { LearningWorkspace } from '../components/learning'
+import { getAdminContent } from '../services/adminContentService'
 
 export function CoursePage() {
   const { id } = useParams()
   const location = useLocation()
-  const course = courses.find((item) => item.id === id)
+  const course = getAdminContent().courses.find((item) => item.id === id) ?? courses.find((item) => item.id === id)
   const [loading, setLoading] = useState(true)
   const [workspaceOpen, setWorkspaceOpen] = useState(Boolean((location.state as { openWorkspace?: boolean } | null)?.openWorkspace))
   usePageView(`Course:${course?.name ?? id ?? 'unknown'}`)

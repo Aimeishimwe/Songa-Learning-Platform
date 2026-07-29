@@ -47,6 +47,7 @@ function buildLearningItems(courseId: string) {
         content: lesson.content,
         duration: '8 min',
         objectives: ['Understand the concept', 'Apply the idea in practice'],
+        description: lesson.videoUrl ? `Video: ${lesson.videoUrl}` : lesson.attachmentName ? `Material: ${lesson.attachmentName}` : undefined,
       })
     })
 

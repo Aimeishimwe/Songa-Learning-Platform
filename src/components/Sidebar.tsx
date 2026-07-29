@@ -1,7 +1,8 @@
 import { BookOpen, ClipboardList, FileBarChart, FolderKanban, LayoutDashboard, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, UserRound, UsersRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import logo from '../assets/S_logo.png'
 
 type NavItem = { to: string; label: string; icon: LucideIcon }
 
@@ -32,7 +33,8 @@ const adminLinks: NavItem[] = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/admin/programs', label: 'Programs', icon: FolderKanban },
   { to: '/admin/courses', label: 'Courses', icon: BookOpen },
-  { to: '/admin/users', label: 'Users', icon: UsersRound },
+  { to: '/admin/users', label: 'Scholars & Mentors', icon: UsersRound },
+  { to: '/admin/announcements', label: 'Announcements', icon: Megaphone },
   { to: '/admin/reports', label: 'Reports', icon: FileBarChart },
   { to: '/admin/profile', label: 'Profile', icon: UserRound },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
@@ -42,6 +44,7 @@ type SidebarProps = { isOpen?: boolean; onClose?: () => void; collapsed?: boolea
 
 export function Sidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse }: SidebarProps) {
   const { role, logout } = useAuth()
+  const navigate = useNavigate()
   const links = role === 'mentor' ? mentorLinks : role === 'admin' ? adminLinks : role === 'graduate' ? graduateLinks : scholarLinks
   const home = role === 'mentor' ? '/mentor/dashboard' : role === 'admin' ? '/admin/dashboard' : role === 'graduate' ? '/graduate/dashboard' : '/home'
   const cls = `sidebar ${isOpen ? 'open' : ''} ${collapsed ? 'collapsed' : ''}`.trim()
@@ -55,7 +58,7 @@ export function Sidebar({ isOpen = false, onClose, collapsed = false, onToggleCo
         <button className="sidebar-close" onClick={onClose} aria-label="Close menu">Close</button>
       </div>
       <Link to={home} className="brand-block" aria-label="Go to dashboard">
-        <div className="brand-icon">S</div>
+        <div className="brand-icon"><img src={logo} alt="" /></div>
         {!collapsed && <div><p className="brand-title">Songa Academy</p><p className="brand-subtitle">Learning platform</p></div>}
       </Link>
       <nav className="nav-list">
@@ -64,6 +67,6 @@ export function Sidebar({ isOpen = false, onClose, collapsed = false, onToggleCo
         </NavLink>)}
       </nav>
     </div>
-    <button className="logout-button" onClick={logout} type="button"><LogOut size={18} aria-hidden="true" /> Log out</button>
+    <button className="logout-button" onClick={() => { logout(); navigate('/', { replace: true }) }} type="button"><LogOut size={18} aria-hidden="true" /> Log out</button>
   </aside>
 }

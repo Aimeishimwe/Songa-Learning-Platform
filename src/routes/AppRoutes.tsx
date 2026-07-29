@@ -32,6 +32,7 @@ const AdminProgramsPage = lazy(() => import('../pages/AdminProgramsPage').then(m
 const AdminCoursesPage = lazy(() => import('../pages/AdminCoursesPage').then(m => ({ default: m.AdminCoursesPage })))
 const AdminUsersPage = lazy(() => import('../pages/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })))
 const AdminReportsPage = lazy(() => import('../pages/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })))
+const AdminAnnouncementsPage = lazy(() => import('../pages/AdminAnnouncementsPage').then(m => ({ default: m.AdminAnnouncementsPage })))
 
 function ProtectedRoute({ children, allowedRoles }: { children: ReactElement; allowedRoles: Array<'scholar' | 'graduate' | 'mentor' | 'admin'> }) {
   const { user, role } = useAuth()
@@ -92,6 +93,7 @@ export function AppRoutes() {
         <Route path="/admin/courses" element={<ProtectedRoute allowedRoles={['admin']}><AdminCoursesPage /></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsersPage /></ProtectedRoute>} />
         <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><AdminReportsPage /></ProtectedRoute>} />
+        <Route path="/admin/announcements" element={<ProtectedRoute allowedRoles={['admin']}><AdminAnnouncementsPage /></ProtectedRoute>} />
         <Route path="/admin/profile" element={<ProtectedRoute allowedRoles={['admin']}><ProfilePage /></ProtectedRoute>} />
         <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><SettingsPage /></ProtectedRoute>} />
       </Route>

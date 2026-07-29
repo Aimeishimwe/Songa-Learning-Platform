@@ -8,7 +8,7 @@ export function MentorLayout() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <div className="app-shell">
+    <div className="app-shell mentor-shell">
       <Sidebar isOpen={open} onClose={() => setOpen(false)} collapsed={collapsed} onToggleCollapse={() => setCollapsed((value) => !value)} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Topbar onToggleSidebar={() => setOpen((v) => !v)} />

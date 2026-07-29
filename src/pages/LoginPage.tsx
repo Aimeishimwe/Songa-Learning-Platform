@@ -1,76 +1,11 @@
 import { useState } from 'react'
+import { ArrowRight, LockKeyhole, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { PageShell } from '../components/PageShell'
 
 export function LoginPage() {
-  const [email, setEmail] = useState('scholar@songa.org')
-  const [password, setPassword] = useState('password')
-  const [error, setError] = useState('')
-  const { login } = useAuth()
-  const navigate = useNavigate()
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
-    const success = login(email, password)
-    if (!success) {
-      setError('Invalid credentials. Try scholar@songa.org, mentor@songa.org, or admin@songa.org.')
-      return
-    }
-
-    setError('')
-    const currentUser = localStorage.getItem('songa-role')
-    if (currentUser) {
-      localStorage.setItem('songa-role', 'scholar')
-    }
-
-    const role = email.includes('mentor') ? 'mentor' : email.includes('admin') ? 'admin' : email.includes('graduate') ? 'graduate' : 'scholar'
-    localStorage.setItem('songa-role', role)
-
-    if (role === 'mentor') {
-      navigate('/mentor/dashboard')
-    } else if (role === 'admin') {
-      navigate('/admin/dashboard')
-    } else if (role === 'graduate') {
-      navigate('/graduate/dashboard')
-    } else {
-      navigate('/home')
-    }
-  }
-
-  return (
-    <PageShell title="Sign in" subtitle="Access your learning journey with Songa Academy.">
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <label>
-          Email
-          <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-        </label>
-        <label>
-          Password
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
-        </label>
-        {error ? <p className="error-text">{error}</p> : null}
-        <button className="btn btn-primary" type="submit">Login</button>
-        <Link className="btn btn-secondary" to="/forgot-password">Forgot Password</Link>
-      </form>
-      <div className="demo-grid">
-        <div className="demo-card">
-          <strong>Scholar</strong>
-          <p>scholar@songa.org / password</p>
-        </div>
-        <div className="demo-card">
-          <strong>Leadership Academy Scholar</strong>
-          <p>eric@songa.org / password</p>
-        </div>
-        <div className="demo-card">
-          <strong>Mentor</strong>
-          <p>mentor@songa.org / password</p>
-        </div>
-        <div className="demo-card">
-          <strong>Admin</strong>
-          <p>admin@songa.org / password</p>
-        </div>
-      </div>
-    </PageShell>
-  )
+  const [email, setEmail] = useState('scholar@songa.org'); const [password, setPassword] = useState('password'); const [error, setError] = useState('')
+  const { login } = useAuth(); const navigate = useNavigate()
+  const handleSubmit = (event: React.FormEvent) => { event.preventDefault(); if (!login(email, password)) { setError('We could not find those details. Try one of the demo accounts below.'); return }; const role = email.includes('mentor') ? 'mentor' : email.includes('admin') ? 'admin' : email.includes('graduate') ? 'graduate' : 'scholar'; localStorage.setItem('songa-role', role); navigate(role === 'mentor' ? '/mentor/dashboard' : role === 'admin' ? '/admin/dashboard' : role === 'graduate' ? '/graduate/dashboard' : '/home') }
+  return <div className="premium-login"><section className="login-story"><Link to="/" className="login-brand"><span className="landing-brand-mark"><img src={new URL('../assets/S_logo.png', import.meta.url).href} alt="" /></span> Songa Academy</Link><div className="login-story-copy"><p className="login-kicker"><Sparkles size={16} /> Your future is in motion</p><h1>Welcome back to a place built for your growth.</h1><p>Keep learning, building, and leading alongside a community that believes in what you can become.</p></div><div className="login-quote"><span>“</span>Small steps, taken consistently, change everything.</div></section><section className="login-form-panel"><div className="login-form-wrap"><p className="eyebrow">Your learning space</p><h2>Sign in to Songa</h2><p className="muted-text">Pick up right where your journey left off.</p><form className="auth-form premium-auth-form" onSubmit={handleSubmit}><label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label><label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>{error && <p className="error-text">{error}</p>}<button className="btn btn-primary" type="submit">Enter your learning space <ArrowRight size={17} /></button></form><Link className="forgot-link" to="/forgot-password"><LockKeyhole size={15} /> Forgot your password?</Link><div className="demo-login"><strong>Explore with a demo account</strong><div><button type="button" onClick={() => { setEmail('scholar@songa.org'); setPassword('password') }}>Scholar</button><button type="button" onClick={() => { setEmail('mentor@songa.org'); setPassword('password') }}>Mentor</button><button type="button" onClick={() => { setEmail('admin@songa.org'); setPassword('password') }}>Admin</button></div></div></div></section></div>
 }

@@ -46,6 +46,7 @@ export interface Course {
   progress: number
   status: 'Active' | 'Locked' | 'Coming Soon'
   modules: string[]
+  coverImage?: string
 }
 
 export interface ModuleItem {
@@ -66,6 +67,9 @@ export interface Lesson {
   title: string
   type: 'Video' | 'Reading' | 'Quiz' | 'Assignment'
   content: string
+  videoUrl?: string
+  materialUrl?: string
+  attachmentName?: string
 }
 
 export interface Assignment {

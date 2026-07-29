@@ -11,6 +11,7 @@ type AuthContextValue = {
   logout: () => void
   enrollCourse?: (courseId: string) => void
   setSelectedProgram?: (programName: string) => void
+  updateProfile?: (details: Pick<User, 'name' | 'email'>) => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -58,7 +59,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({ ...user, selectedProgram: programName })
   }
 
-  const value = useMemo(() => ({ user, role, login, logout, enrollCourse, setSelectedProgram }), [user, role])
+  const updateProfile = (details: Pick<User, 'name' | 'email'>) => {
+    if (!user) return
+    setUser({ ...user, ...details })
+  }
+
+  const value = useMemo(() => ({ user, role, login, logout, enrollCourse, setSelectedProgram, updateProfile }), [user, role])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

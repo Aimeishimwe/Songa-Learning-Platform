@@ -1,12 +1,12 @@
 :root {
   /* Colors */
-  --color-bg: #eff2fb;
+  --color-bg: #f6f7fb;
   --color-surface: #ffffff;
   --color-text: #111827;
   --color-muted: #52607e;
-  --color-primary: #1f2b5e;
-  --color-primary-600: #162146;
-  --color-accent: #d2ae2c;
+  --color-primary: #18234f;
+  --color-primary-600: #101938;
+  --color-accent: #e7b94e;
   --color-accent-600: #b99628;
   --color-danger: #ef4444;
 

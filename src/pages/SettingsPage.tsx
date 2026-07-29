@@ -13,7 +13,8 @@ function createId(prefix: string) {
 
 export function SettingsPage() {
   usePageView('Settings')
-  const { role, user } = useAuth()
+  const { role, user, updateProfile } = useAuth()
+  const [accountForm, setAccountForm] = useState({ name: user?.name ?? '', email: user?.email ?? '' })
   const [programsState, setProgramsState] = useState<Program[]>(() => initialPrograms)
   const [courseState, setCourseState] = useState<Course[]>(() => initialCourses)
   const [programForm, setProgramForm] = useState({ name: '', description: '', academies: '' })
@@ -21,6 +22,8 @@ export function SettingsPage() {
   const [editingProgramId, setEditingProgramId] = useState<string | null>(null)
 
   const adminTools = useMemo(() => role === 'admin', [role])
+
+  const saveAccount = () => updateProfile?.({ name: accountForm.name.trim() || user?.name || '', email: accountForm.email.trim() || user?.email || '' })
 
   const addOrUpdateProgram = (event: React.FormEvent) => {
     event.preventDefault()
@@ -78,11 +81,11 @@ export function SettingsPage() {
           <div className="card-stack">
             <label>
               Full name
-              <input defaultValue={user?.name ?? ''} />
+              <input value={accountForm.name} onChange={(event) => setAccountForm((current) => ({ ...current, name: event.target.value }))} />
             </label>
             <label>
               Email
-              <input defaultValue={user?.email ?? ''} />
+              <input type="email" value={accountForm.email} onChange={(event) => setAccountForm((current) => ({ ...current, email: event.target.value }))} />
             </label>
             <div>
               <h4 style={{ margin: '8px 0' }}>Change password</h4>
@@ -96,7 +99,7 @@ export function SettingsPage() {
               </label>
               <div className="setting-actions">
                 <Button variant="ghost">Reset</Button>
-                <Button variant="primary">Save changes</Button>
+                <Button variant="primary" type="button" onClick={saveAccount}>Save changes</Button>
               </div>
             </div>
           </div>
