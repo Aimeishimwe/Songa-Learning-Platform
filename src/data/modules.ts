@@ -1,0 +1,48 @@
+import type { ModuleItem } from '../types'
+
+export const modules: ModuleItem[] = [
+  {
+    id: 'module-frontend-1',
+    courseId: 'course-frontend',
+    title: 'Introduction to Web Development',
+    number: 1,
+    status: 'Completed',
+    lessons: ['lesson-frontend-1'],
+    resources: ['Project brief', 'Starter files'],
+    assignmentId: 'assignment-frontend-1',
+    quizId: 'quiz-frontend-1',
+  },
+  {
+    id: 'module-frontend-2',
+    courseId: 'course-frontend',
+    title: 'HTML Fundamentals',
+    number: 2,
+    status: 'Completed',
+    lessons: ['lesson-frontend-2'],
+    resources: ['HTML cheat sheet'],
+    assignmentId: 'assignment-frontend-2',
+    quizId: 'quiz-frontend-2',
+  },
+  {
+    id: 'module-frontend-3',
+    courseId: 'course-frontend',
+    title: 'CSS Fundamentals',
+    number: 3,
+    status: 'Current',
+    lessons: ['lesson-frontend-3'],
+    resources: ['CSS reference'],
+    assignmentId: 'assignment-frontend-3',
+    quizId: 'quiz-frontend-3',
+  },
+  {
+    id: 'module-frontend-4',
+    courseId: 'course-frontend',
+    title: 'JavaScript Basics',
+    number: 4,
+    status: 'Locked',
+    lessons: ['lesson-frontend-4'],
+    resources: ['JavaScript notes'],
+    assignmentId: 'assignment-frontend-4',
+    quizId: 'quiz-frontend-4',
+  },
+]
