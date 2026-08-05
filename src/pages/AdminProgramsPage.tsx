@@ -1,13 +1,13 @@
 import { PageShell } from '../components/PageShell'
 import { Card, Button } from '../components/ui'
 import { useProgramContext } from '../context/ProgramContext'
-import { programs as initialPrograms } from '../data/programs'
+import { getPlatformData } from '../services/platformService'
 import { useState } from 'react'
 import type { Program } from '../types'
 
 export function AdminProgramsPage() {
   const { activeProgram, setActiveProgram } = useProgramContext()
-  const [programsState, setProgramsState] = useState<Program[]>(() => initialPrograms)
+  const [programsState, setProgramsState] = useState<Program[]>(() => getPlatformData().programs)
   const [form, setForm] = useState({ name: '', description: '', academies: '' })
 
   const saveProgram = (event: React.FormEvent) => {
@@ -27,7 +27,7 @@ export function AdminProgramsPage() {
   }
 
   return (
-    <PageShell title="Programs management" subtitle="Create, edit, and organize programs.">
+    <PageShell title="Program Management" subtitle="Create, edit, and organize programs for each learning ecosystem.">
       <Card style={{ marginBottom: 16 }}>
         <div className="card-heading-row">
           <div>

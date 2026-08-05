@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Card, Button } from '../ui'
 import type { Course, Assignment, Assessment } from '../../types'
 import { loadCourseProgress, saveCourseProgress } from './learningStorage'
-import { getAdminContent } from '../../services/adminContentService'
+import { getPlatformData } from '../../services/platformService'
 
 type LearningItemType = 'lesson' | 'video' | 'quiz' | 'assignment'
 
@@ -25,7 +25,7 @@ type LearningWorkspaceProps = {
 }
 
 function buildLearningItems(courseId: string) {
-  const { modules, lessons, assignments, assessments } = getAdminContent()
+  const { modules, lessons, assignments, assessments } = getPlatformData()
   const courseModules = modules.filter((module) => module.courseId === courseId)
   const items: LearningItem[] = []
 

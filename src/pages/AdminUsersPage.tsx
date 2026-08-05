@@ -24,7 +24,7 @@ export function AdminUsersPage() {
   }
 
   return (
-    <PageShell title="Users management" subtitle="Manage scholars and mentors within the selected program.">
+    <PageShell title="Learner Management" subtitle="Manage scholars, mentors, enrollments, and progress monitoring within the selected program.">
       <Card style={{ marginBottom: 16 }}>
         <div className="card-heading-row">
           <div>

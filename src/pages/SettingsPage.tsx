@@ -106,35 +106,27 @@ export function SettingsPage() {
         </Card>
 
         <Card>
-          <h3>Notifications</h3>
+          <h3>Preferences</h3>
           <div className="card-stack">
             <div className="setting-row">
               <div>
-                <label>Email notifications</label>
-                <div className="setting-help">Receive activity and assignment emails</div>
+                <label>Dashboard shortcuts</label>
+                <div className="setting-help">Keep the most-used learner actions easy to reach.</div>
               </div>
               <input className="toggle" type="checkbox" defaultChecked />
             </div>
 
             <div className="setting-row">
               <div>
-                <label>Push notifications</label>
-                <div className="setting-help">Live session reminders and urgent updates</div>
-              </div>
-              <input className="toggle" type="checkbox" />
-            </div>
-
-            <div className="setting-row">
-              <div>
-                <label>Assignment reminders</label>
-                <div className="setting-help">Remind me before due dates</div>
+                <label>Progress reminders</label>
+                <div className="setting-help">Surface milestone nudges inside the platform.</div>
               </div>
               <input className="toggle" type="checkbox" defaultChecked />
             </div>
 
             <div className="setting-actions">
               <Button variant="ghost">Reset</Button>
-              <Button variant="primary">Save notifications</Button>
+              <Button variant="primary">Save preferences</Button>
             </div>
           </div>
         </Card>

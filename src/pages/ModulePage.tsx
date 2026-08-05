@@ -1,14 +1,14 @@
 import { useParams } from 'react-router-dom'
 import { PageShell } from '../components/PageShell'
-import { modules } from '../data/modules'
-import { lessons } from '../data/lessons'
 import { useEffect, useState } from 'react'
 import { SkeletonList } from '../components/ui'
+import { getPlatformData } from '../services/platformService'
 
 export function ModulePage() {
   const { id } = useParams()
-  const moduleItem = modules.find((item) => item.id === id)
-  const moduleLessons = lessons.filter((lesson) => lesson.moduleId === id)
+  const platformData = getPlatformData()
+  const moduleItem = platformData.modules.find((item) => item.id === id)
+  const moduleLessons = platformData.lessons.filter((lesson) => lesson.moduleId === id)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

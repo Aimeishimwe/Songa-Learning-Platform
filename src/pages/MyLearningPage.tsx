@@ -4,14 +4,14 @@ import { PageShell } from '../components/PageShell'
 import { usePageView } from '../hooks/usePageView'
 import { Card, Button, Skeleton } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
-import { getAdminContent } from '../services/adminContentService'
+import { getPlatformData } from '../services/platformService'
 
 export function MyLearningPage() {
   usePageView('MyCourses')
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   useEffect(() => { const timer = setTimeout(() => setLoading(false), 300); return () => clearTimeout(timer) }, [])
-  const learningContent = getAdminContent()
+  const learningContent = getPlatformData()
   const display = learningContent.courses.filter((course) => (user?.enrolledCourses ?? []).includes(course.id))
 
   return <PageShell title="My Courses" subtitle="Your enrolled learning paths.">

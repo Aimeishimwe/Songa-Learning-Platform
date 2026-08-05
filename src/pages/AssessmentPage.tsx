@@ -2,21 +2,20 @@ import { useEffect, useState } from 'react'
 import { /* useParams */ } from 'react-router-dom'
 import { PageShell } from '../components/PageShell'
 import { useAuth } from '../context/AuthContext'
-import { assignments } from '../data/assignments'
-import { assessments } from '../data/assessments'
-import { courses } from '../data/courses'
 import { Card, ProgressRing, Skeleton } from '../components/ui'
 import { usePageView } from '../hooks/usePageView'
+import { getPlatformData } from '../services/platformService'
 
 export function AssessmentPage() {
   // route param not used currently
   const { user } = useAuth()
   usePageView('Assessments')
 
-  const course = courses.find((c) => c.name === user?.course) ?? courses[0]
+  const platformData = getPlatformData()
+  const course = platformData.courses.find((c) => c.name === user?.course) ?? platformData.courses[0]
 
-  const courseAssignments = assignments.filter((a) => a.courseId === course.id)
-  const courseAssessments = assessments.filter((a) => a.courseId === course.id)
+  const courseAssignments = platformData.assignments.filter((a) => a.courseId === course.id)
+  const courseAssessments = platformData.assessments.filter((a) => a.courseId === course.id)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

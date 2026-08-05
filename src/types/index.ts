@@ -1,4 +1,4 @@
-export type UserRole = 'scholar' | 'graduate' | 'mentor' | 'admin'
+export type UserRole = 'scholar' | 'mentor' | 'admin'
 
 export interface User {
   id: string
@@ -92,6 +92,36 @@ export interface Assessment {
   graded?: boolean
 }
 
+export interface Feedback {
+  id: string
+  submissionId: string
+  mentorId: string
+  comments: string
+  grade: string
+  suggestions: string[]
+}
+
+export interface Progress {
+  userId: string
+  courseId: string
+  completedLessons: number
+  totalLessons: number
+  assignmentsCompleted: number
+  courseProgress: number
+  lastActivity: string
+}
+
+export interface Submission {
+  id: string
+  assignmentId: string
+  scholarId: string
+  submittedAt: string
+  fileName: string
+  notes: string
+  status: string
+}
+
+// Refined Announcement with targeting properties
 export interface Announcement {
   id: string
   title: string
@@ -99,6 +129,10 @@ export interface Announcement {
   date: string
   description: string
   program?: 'All' | 'Songa Girls Initiative' | 'Songa Leadership Academy'
+  targetProgramId?: string  // 'program-girls', 'program-leadership', 'All'
+  targetCourseId?: string   // course-frontend, course-backend, 'All', or undefined
+  targetRole?: UserRole | 'All' // 'scholar', 'mentor', 'admin', 'All'
+  createdBy: string
 }
 
 export interface EventItem {
@@ -108,4 +142,43 @@ export interface EventItem {
   time: string
   description: string
   joinLink: string
+}
+
+// Refined backend entities:
+export interface Enrollment {
+  id: string
+  userId: string
+  courseId: string
+  programId: string
+  academy: string
+  cohort: string
+  enrolledAt: string
+  status: 'Active' | 'Completed' | 'Dropped'
+}
+
+export interface LessonProgress {
+  id: string
+  userId: string
+  lessonId: string
+  courseId: string
+  status: 'Not Started' | 'In Progress' | 'Completed'
+  lastViewedAt: string
+}
+
+export interface MentorCourseAssignment {
+  id: string
+  mentorId: string
+  courseId: string
+  assignedAt: string
+  status: 'Active' | 'Inactive'
+}
+
+export interface Notification {
+  id: string
+  userId: string
+  title: string
+  message: string
+  type: 'Announcement' | 'Grade' | 'Assignment' | 'General'
+  read: boolean
+  createdAt: string
 }

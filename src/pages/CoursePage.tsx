@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { PageShell } from '../components/PageShell'
-import { courses } from '../data/courses'
 import { usePageView } from '../hooks/usePageView'
 import { Card, Skeleton } from '../components/ui'
 import { CourseOverviewCard } from '../components/learning'
 import { LearningWorkspace } from '../components/learning'
-import { getAdminContent } from '../services/adminContentService'
+import { getPlatformData } from '../services/platformService'
 
 export function CoursePage() {
   const { id } = useParams()
   const location = useLocation()
-  const course = getAdminContent().courses.find((item) => item.id === id) ?? courses.find((item) => item.id === id)
+  const platformData = getPlatformData()
+  const course = platformData.courses.find((item) => item.id === id)
   const [loading, setLoading] = useState(true)
   const [workspaceOpen, setWorkspaceOpen] = useState(Boolean((location.state as { openWorkspace?: boolean } | null)?.openWorkspace))
   usePageView(`Course:${course?.name ?? id ?? 'unknown'}`)

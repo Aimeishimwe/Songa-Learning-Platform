@@ -2,11 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { PageShell } from '../components/PageShell'
 import { Card, Button } from '../components/ui'
 import { useProgramContext } from '../context/ProgramContext'
-import { courses as initialCourses } from '../data/courses'
-import { lessons as initialLessons } from '../data/lessons'
-import { modules as initialModules } from '../data/modules'
-import { assignments as initialAssignments } from '../data/assignments'
-import { assessments as initialAssessments } from '../data/assessments'
+import { getPlatformData } from '../services/platformService'
 import type { Assessment, Assignment, Course, Lesson, ModuleItem } from '../types'
 
 type AdminCourseState = {
@@ -20,26 +16,27 @@ type AdminCourseState = {
 const storageKey = 'songa-admin-course-state-v1'
 
 function loadAdminCourseState(): AdminCourseState {
+  const platformData = getPlatformData()
   if (typeof window === 'undefined') {
-    return { courses: initialCourses, modules: initialModules, lessons: initialLessons, assignments: initialAssignments, assessments: initialAssessments }
+    return { courses: platformData.courses, modules: platformData.modules, lessons: platformData.lessons, assignments: platformData.assignments, assessments: platformData.assessments }
   }
 
   const raw = window.localStorage.getItem(storageKey)
   if (!raw) {
-    return { courses: initialCourses, modules: initialModules, lessons: initialLessons, assignments: initialAssignments, assessments: initialAssessments }
+    return { courses: platformData.courses, modules: platformData.modules, lessons: platformData.lessons, assignments: platformData.assignments, assessments: platformData.assessments }
   }
 
   try {
     const parsed = JSON.parse(raw) as AdminCourseState
     return {
-      courses: parsed.courses?.length ? parsed.courses : initialCourses,
-      modules: parsed.modules?.length ? parsed.modules : initialModules,
-      lessons: parsed.lessons?.length ? parsed.lessons : initialLessons,
-      assignments: parsed.assignments?.length ? parsed.assignments : initialAssignments,
-      assessments: parsed.assessments?.length ? parsed.assessments : initialAssessments,
+      courses: parsed.courses?.length ? parsed.courses : platformData.courses,
+      modules: parsed.modules?.length ? parsed.modules : platformData.modules,
+      lessons: parsed.lessons?.length ? parsed.lessons : platformData.lessons,
+      assignments: parsed.assignments?.length ? parsed.assignments : platformData.assignments,
+      assessments: parsed.assessments?.length ? parsed.assessments : platformData.assessments,
     }
   } catch {
-    return { courses: initialCourses, modules: initialModules, lessons: initialLessons, assignments: initialAssignments, assessments: initialAssessments }
+    return { courses: platformData.courses, modules: platformData.modules, lessons: platformData.lessons, assignments: platformData.assignments, assessments: platformData.assessments }
   }
 }
 
@@ -208,227 +205,231 @@ export function AdminCoursesPage() {
   }
 
   return (
-    <PageShell title="Courses management" subtitle="Create and organize learning content for each program.">
-      <Card style={{ marginBottom: 16 }}>
-        <div className="card-heading-row">
-          <div>
-            <p className="eyebrow">Program workspace</p>
-            <h3>{activeProgram.name}</h3>
-          </div>
+    <PageShell title="Learning Management" subtitle="Build courses, structure modules, draft lessons, and prepare assignments from one focused workspace.">
+      <Card className="admin-ops-hero">
+        <div>
+          <p className="eyebrow">Learning operations center</p>
+          <h3>{activeProgram.name}</h3>
+          <p>Keep the selected program aligned with a clear draft-to-preview-to-publish lesson workflow.</p>
         </div>
-        <p className="muted-text">Only courses for this program are shown and edited here.</p>
+        <div className="admin-ops-badges">
+          <span>Programs</span>
+          <span>Courses</span>
+          <span>Modules</span>
+          <span>Lessons</span>
+          <span>Assignments</span>
+          <span>Assessments</span>
+        </div>
       </Card>
 
-      <Card style={{ marginBottom: 16 }}>
-        <div className="card-heading-row">
-          <div>
-            <p className="eyebrow">Add a course</p>
-            <h3>Create a new learning path</h3>
+      <div className="admin-ops-grid">
+        <Card className="admin-ops-side-card">
+          <div className="card-heading-row">
+            <div>
+              <p className="eyebrow">Create a learning path</p>
+              <h3>New course</h3>
+            </div>
           </div>
-        </div>
-        <form className="auth-form" onSubmit={addCourse}>
-          <label>
-            Course name
-            <input value={courseForm.name} onChange={(event) => setCourseForm((current) => ({ ...current, name: event.target.value }))} placeholder="Leadership Lab" />
-          </label>
-          <label>
-            Description
-            <textarea rows={3} value={courseForm.description} onChange={(event) => setCourseForm((current) => ({ ...current, description: event.target.value }))} placeholder="What scholars will learn." />
-          </label>
-          <label>
-            Academy
-            <input value={courseForm.academy} onChange={(event) => setCourseForm((current) => ({ ...current, academy: event.target.value }))} placeholder="New academy" />
-          </label>
-          <label>
-            Mentor
-            <input value={courseForm.mentor} onChange={(event) => setCourseForm((current) => ({ ...current, mentor: event.target.value }))} placeholder="Mentor name" />
-          </label>
-          <label>
-            Duration
-            <input value={courseForm.duration} onChange={(event) => setCourseForm((current) => ({ ...current, duration: event.target.value }))} placeholder="4 weeks" />
-          </label>
-          <label>Course cover image URL<input value={courseForm.coverImage} onChange={(event) => setCourseForm((current) => ({ ...current, coverImage: event.target.value }))} placeholder="https://..." /></label>
-          <label>Or upload a cover image<input type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => setCourseForm((current) => ({ ...current, coverImage: String(reader.result) })); reader.readAsDataURL(file) }} /></label>
-          <Button variant="primary" type="submit">Save course</Button>
-        </form>
-      </Card>
+          <form className="auth-form" onSubmit={addCourse}>
+            <label>
+              Course name
+              <input value={courseForm.name} onChange={(event) => setCourseForm((current) => ({ ...current, name: event.target.value }))} placeholder="Leadership Lab" />
+            </label>
+            <label>
+              Description
+              <textarea rows={4} value={courseForm.description} onChange={(event) => setCourseForm((current) => ({ ...current, description: event.target.value }))} placeholder="What scholars will learn." />
+            </label>
+            <label>
+              Academy
+              <input value={courseForm.academy} onChange={(event) => setCourseForm((current) => ({ ...current, academy: event.target.value }))} placeholder="New academy" />
+            </label>
+            <label>
+              Mentor
+              <input value={courseForm.mentor} onChange={(event) => setCourseForm((current) => ({ ...current, mentor: event.target.value }))} placeholder="Mentor name" />
+            </label>
+            <label>
+              Duration
+              <input value={courseForm.duration} onChange={(event) => setCourseForm((current) => ({ ...current, duration: event.target.value }))} placeholder="4 weeks" />
+            </label>
+            <label>Course cover image URL<input value={courseForm.coverImage} onChange={(event) => setCourseForm((current) => ({ ...current, coverImage: event.target.value }))} placeholder="https://..." /></label>
+            <label>Or upload a cover image<input type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => setCourseForm((current) => ({ ...current, coverImage: String(reader.result) })); reader.readAsDataURL(file) }} /></label>
+            <Button variant="primary" type="submit">Save course</Button>
+          </form>
+        </Card>
+
+        <Card className="admin-ops-side-card">
+          <div className="card-heading-row">
+            <div>
+              <p className="eyebrow">Lesson workflow</p>
+              <h3>Draft to publish</h3>
+            </div>
+          </div>
+          <div className="admin-lesson-flow">
+            <div><strong>Draft</strong><span>Create the lesson structure and title.</span></div>
+            <div><strong>Add content blocks</strong><span>Shape the notes and supporting materials.</span></div>
+            <div><strong>Preview</strong><span>Review the lesson before it goes live.</span></div>
+            <div><strong>Publish</strong><span>Make it available for the course journey.</span></div>
+          </div>
+          <div className="admin-ops-summary">
+            <div><strong>{programCourses.length}</strong><span>courses</span></div>
+            <div><strong>{adminState.modules.filter((module) => programCourses.some((course) => course.id === module.courseId)).length}</strong><span>modules</span></div>
+            <div><strong>{adminState.lessons.length}</strong><span>lessons</span></div>
+          </div>
+        </Card>
+      </div>
 
       <div className="card-stack">
         {programCourses.map((course) => {
           const courseModules = adminState.modules.filter((module) => module.courseId === course.id)
           return (
-            <Card key={course.id}>
+            <Card key={course.id} className="admin-module-stack-card">
               <div className="card-heading-row">
                 <div>
                   <p className="eyebrow">Course</p>
                   <h3>{course.name}</h3>
                 </div>
-                <Button variant="ghost" type="button" onClick={() => removeCourse(course.id)}>Delete</Button>
+                <Button variant="ghost" type="button" onClick={() => removeCourse(course.id)}>Delete course</Button>
               </div>
               <p>{course.description}</p>
               {course.coverImage ? <img className="admin-course-cover" src={course.coverImage} alt={`${course.name} cover`} /> : null}
               <p className="muted-text">Academy: {course.academy} • Mentor: {course.mentor} • Duration: {course.duration}</p>
 
-              <div className="card-stack" style={{ marginTop: 12 }}>
-                <h4>Modules</h4>
+              <div className="admin-module-stack" style={{ marginTop: 14 }}>
                 {courseModules.length ? courseModules.map((module) => {
                   const moduleLessons = adminState.lessons.filter((lesson) => lesson.moduleId === module.id)
                   return (
-                    <div key={module.id} className="card" style={{ padding: 12 }}>
+                    <div key={module.id} className="admin-module-card">
                       <div className="card-heading-row">
-                        <strong>{module.title}</strong>
+                        <div>
+                          <p className="eyebrow">Module {module.number}</p>
+                          <h3>{module.title}</h3>
+                        </div>
                         <div className="setting-actions">
-                          <Button variant="secondary" type="button" onClick={() => { setEditingModuleId(module.id); setModuleForms((current) => ({ ...current, [course.id]: { title: module.title, resources: module.resources.join(', ') } })) }}>Edit</Button>
+                          <Button variant="secondary" type="button" onClick={() => { setEditingModuleId(module.id); setModuleForms((current) => ({ ...current, [course.id]: { title: module.title, resources: module.resources.join(', ') } })) }}>Edit module</Button>
                           <Button variant="ghost" type="button" onClick={() => removeModule(module.id)}>Remove</Button>
                         </div>
                       </div>
                       {module.resources.length ? <p className="muted-text">Resources: {module.resources.join(', ')}</p> : null}
-                      <div className="card-stack" style={{ marginTop: 8 }}>
+
+                      <div className="admin-lesson-list">
                         {moduleLessons.length ? moduleLessons.map((lesson) => (
-                          <div key={lesson.id} className="announcement-item">
+                          <div key={lesson.id} className="admin-lesson-row">
                             <div>
                               <strong>{lesson.title}</strong>
                               <p>{lesson.type} • {lesson.content}</p>
                             </div>
                             <Button variant="ghost" type="button" onClick={() => removeLesson(lesson.id)}>Delete</Button>
                           </div>
-                        )) : <p className="muted-text">No lessons yet.</p>}
+                        )) : <p className="muted-text">No lessons yet. Add the first lesson to start the learning path.</p>}
                       </div>
-                      <div className="card-stack" style={{ marginTop: 8 }}>
-                        <div className="admin-lesson-builder-heading"><div><p className="eyebrow">Lessons in this module</p><h4>Create a lesson for {module.title}</h4></div><span>Module {module.number}</span></div>
-                        <label>
-                          Lesson title
-                          <input
-                            value={lessonForms[module.id]?.title ?? ''}
-                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), title: event.target.value } }))}
-                            placeholder="e.g. What is HTML?"
-                          />
-                        </label>
-                        <label>
-                          Lesson type
-                          <select
-                            value={lessonForms[module.id]?.type ?? 'Reading'}
-                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), type: event.target.value as Lesson['type'] } }))}
-                          >
-                            <option value="Video">Video</option>
-                            <option value="Reading">Reading</option>
-                            <option value="Quiz">Quiz</option>
-                            <option value="Assignment">Assignment</option>
-                          </select>
-                        </label>
-                        <label>
-                          Lesson notes
-                          <textarea
-                            rows={2}
-                            value={lessonForms[module.id]?.content ?? ''}
-                            onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), content: event.target.value } }))}
-                            placeholder="Write the lesson content or instructions"
-                          />
-                        </label>
-                        <label>Video link (optional)<input value={lessonForms[module.id]?.videoUrl ?? ''} onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), videoUrl: event.target.value } }))} placeholder="https://youtube.com/..." /></label>
-                        <label>Supporting material (optional)<input type="file" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), materialUrl: String(reader.result), attachmentName: file.name } })); reader.readAsDataURL(file) }} /></label>
-                        <Button variant="secondary" type="button" onClick={() => addLesson(module.id)}>Create lesson in this module</Button>
+
+                      <div className="admin-lesson-editor">
+                        <div className="admin-lesson-builder-heading">
+                          <div>
+                            <p className="eyebrow">Lesson editor</p>
+                            <h4>Create a lesson for {module.title}</h4>
+                          </div>
+                          <span>Draft • Preview • Publish</span>
+                        </div>
+                        <div className="admin-form-grid">
+                          <label>
+                            Lesson title
+                            <input value={lessonForms[module.id]?.title ?? ''} onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), title: event.target.value } }))} placeholder="e.g. What is HTML?" />
+                          </label>
+                          <label>
+                            Lesson type
+                            <select value={lessonForms[module.id]?.type ?? 'Reading'} onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), type: event.target.value as Lesson['type'] } }))}>
+                              <option value="Video">Video</option>
+                              <option value="Reading">Reading</option>
+                              <option value="Quiz">Quiz</option>
+                              <option value="Assignment">Assignment</option>
+                            </select>
+                          </label>
+                          <label className="full">
+                            Lesson notes
+                            <textarea rows={6} value={lessonForms[module.id]?.content ?? ''} onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), content: event.target.value } }))} placeholder="Write a rich lesson summary and instructions for scholars." />
+                          </label>
+                          <label>
+                            Video link (optional)
+                            <input value={lessonForms[module.id]?.videoUrl ?? ''} onChange={(event) => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), videoUrl: event.target.value } }))} placeholder="https://youtube.com/..." />
+                          </label>
+                          <label>
+                            Supporting material (optional)
+                            <input type="file" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => setLessonForms((current) => ({ ...current, [module.id]: { ...(current[module.id] ?? { title: '', type: 'Reading', content: '', videoUrl: '', materialUrl: '', attachmentName: '' }), materialUrl: String(reader.result), attachmentName: file.name } })); reader.readAsDataURL(file) }} />
+                          </label>
+                          <div className="setting-actions full">
+                            <Button variant="secondary" type="button" onClick={() => addLesson(module.id)}>Create lesson</Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )
-                }) : <p className="muted-text">There are no modules yet.</p>}
+                }) : <p className="muted-text">There are no modules yet. Add your first module to start building the course journey.</p>}
               </div>
 
-              <div className="card-stack" style={{ marginTop: 12 }}>
-                <label>
-                  {editingModuleId ? 'Edit module' : 'Add a module'}
-                  <input
-                    value={moduleForms[course.id]?.title ?? ''}
-                    onChange={(event) => setModuleForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { title: '', resources: '' }), title: event.target.value } }))}
-                    placeholder="Module title"
-                  />
-                </label>
-                <label>
-                  Resources
-                  <input
-                    value={moduleForms[course.id]?.resources ?? ''}
-                    onChange={(event) => setModuleForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { title: '', resources: '' }), resources: event.target.value } }))}
-                    placeholder="Slides, homework, guide"
-                  />
-                </label>
-                <div className="setting-actions">
-                  {editingModuleId ? <Button variant="ghost" type="button" onClick={() => { setEditingModuleId(null); setModuleForms((current) => ({ ...current, [course.id]: { title: '', resources: '' } })) }}>Cancel</Button> : null}
-                  <Button variant="primary" type="button" onClick={() => addModule(course.id)}>{editingModuleId ? 'Save module' : 'Add module'}</Button>
+              <div className="admin-lesson-editor" style={{ marginTop: 14 }}>
+                <div className="admin-lesson-builder-heading">
+                  <div>
+                    <p className="eyebrow">Module builder</p>
+                    <h4>{editingModuleId ? 'Update the module' : 'Add a new module'}</h4>
+                  </div>
+                  <span>Resources • sequence</span>
+                </div>
+                <div className="admin-form-grid">
+                  <label className="full">
+                    Module title
+                    <input value={moduleForms[course.id]?.title ?? ''} onChange={(event) => setModuleForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { title: '', resources: '' }), title: event.target.value } }))} placeholder="Module title" />
+                  </label>
+                  <label className="full">
+                    Resources
+                    <input value={moduleForms[course.id]?.resources ?? ''} onChange={(event) => setModuleForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { title: '', resources: '' }), resources: event.target.value } }))} placeholder="Slides, homework, guide" />
+                  </label>
+                  <div className="setting-actions full">
+                    {editingModuleId ? <Button variant="ghost" type="button" onClick={() => { setEditingModuleId(null); setModuleForms((current) => ({ ...current, [course.id]: { title: '', resources: '' } })) }}>Cancel</Button> : null}
+                    <Button variant="primary" type="button" onClick={() => addModule(course.id)}>{editingModuleId ? 'Save module' : 'Add module'}</Button>
+                  </div>
                 </div>
               </div>
-                            <div className="card-stack" style={{ marginTop: 12 }}>
-                <h4>Learning activities</h4>
 
-                <label>
-                  Activity type
-                  <select
-                    value={activityForms[course.id]?.type ?? 'Assignment'}
-                    onChange={(event) =>
-                      setActivityForms((current) => ({
-                        ...current,
-                        [course.id]: {
-                          ...(current[course.id] ?? {
-                            type: 'Assignment', title: '', date: '', moduleId: '', instructions: '',
-                          }),
-                          type: event.target.value as 'Quiz' | 'Assignment',
-                        },
-                      }))
-                    }
-                  >
-                    <option value="Assignment">Assignment</option>
-                    <option value="Quiz">Quiz</option>
-                  </select>
-                </label>
-
-                <label>
-                  Activity title
-                  <input
-                    value={activityForms[course.id]?.title ?? ''}
-                    onChange={(event) =>
-                      setActivityForms((current) => ({
-                        ...current,
-                        [course.id]: {
-                          ...(current[course.id] ?? {
-                            type: 'Assignment', title: '', date: '', moduleId: '', instructions: '',
-                          }),
-                          title: event.target.value,
-                        },
-                      }))
-                    }
-                    placeholder="Assignment or quiz title"
-                  />
-                </label>
-
-                <label>
-                  Date
-                  <input
-                    type="date"
-                    value={activityForms[course.id]?.date ?? ''}
-                    onChange={(event) =>
-                      setActivityForms((current) => ({
-                        ...current,
-                        [course.id]: {
-                          ...(current[course.id] ?? {
-                            type: 'Assignment',
-                            title: '',
-                            date: '',
-                          }),
-                          date: event.target.value,
-                        },
-                      }))
-                    }
-                  />
-                </label>
-                <label>Place inside module<select value={activityForms[course.id]?.moduleId ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', instructions: '' }), moduleId: event.target.value } }))}><option value="">Choose a module</option>{courseModules.map((module) => <option key={module.id} value={module.id}>Module {module.number}: {module.title}</option>)}</select></label>
-                <label>Instructions<textarea rows={3} value={activityForms[course.id]?.instructions ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', moduleId: '' }), instructions: event.target.value } }))} placeholder="What should scholars do?" /></label>
-
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={() => addActivity(course.id)}
-                >
-                  Add activity
-                </Button>
+              <div className="admin-lesson-editor" style={{ marginTop: 14 }}>
+                <div className="admin-lesson-builder-heading">
+                  <div>
+                    <p className="eyebrow">Learning activities</p>
+                    <h4>Attach assignments and quizzes</h4>
+                  </div>
+                  <span>Monitor completion</span>
+                </div>
+                <div className="admin-form-grid">
+                  <label>
+                    Activity type
+                    <select value={activityForms[course.id]?.type ?? 'Assignment'} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', moduleId: '', instructions: '' }), type: event.target.value as 'Quiz' | 'Assignment' } }))}>
+                      <option value="Assignment">Assignment</option>
+                      <option value="Quiz">Quiz</option>
+                    </select>
+                  </label>
+                  <label>
+                    Activity title
+                    <input value={activityForms[course.id]?.title ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', moduleId: '', instructions: '' }), title: event.target.value } }))} placeholder="Assignment or quiz title" />
+                  </label>
+                  <label>
+                    Due date
+                    <input type="date" value={activityForms[course.id]?.date ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', moduleId: '', instructions: '' }), date: event.target.value } }))} />
+                  </label>
+                  <label>
+                    Place inside module
+                    <select value={activityForms[course.id]?.moduleId ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', moduleId: '', instructions: '' }), moduleId: event.target.value } }))}>
+                      <option value="">Choose a module</option>
+                      {courseModules.map((module) => <option key={module.id} value={module.id}>Module {module.number}: {module.title}</option>)}
+                    </select>
+                  </label>
+                  <label className="full">
+                    Instructions
+                    <textarea rows={4} value={activityForms[course.id]?.instructions ?? ''} onChange={(event) => setActivityForms((current) => ({ ...current, [course.id]: { ...(current[course.id] ?? { type: 'Assignment', title: '', date: '', moduleId: '', instructions: '' }), instructions: event.target.value } }))} placeholder="What should scholars do?" />
+                  </label>
+                  <div className="setting-actions full">
+                    <Button variant="secondary" type="button" onClick={() => addActivity(course.id)}>Add activity</Button>
+                  </div>
+                </div>
               </div>
             </Card>
           )

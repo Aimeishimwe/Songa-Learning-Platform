@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardList, FileBarChart, FolderKanban, LayoutDashboard, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, UserRound, UsersRound } from 'lucide-react'
+import { BookOpen, ClipboardList, LayoutDashboard, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, UserRound, UsersRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -17,26 +17,16 @@ const scholarLinks: NavItem[] = [
 
 const mentorLinks: NavItem[] = [
   { to: '/mentor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/mentor/cohorts', label: 'My Cohorts', icon: UsersRound },
   { to: '/mentor/assignments', label: 'Assignments', icon: ClipboardList },
   { to: '/mentor/profile', label: 'Profile', icon: UserRound },
   { to: '/mentor/settings', label: 'Settings', icon: Settings },
 ]
 
-const graduateLinks: NavItem[] = [
-  { to: '/graduate/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/graduate/profile', label: 'Profile', icon: UserRound },
-  { to: '/graduate/settings', label: 'Settings', icon: Settings },
-]
-
 const adminLinks: NavItem[] = [
-  { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin/programs', label: 'Programs', icon: FolderKanban },
-  { to: '/admin/courses', label: 'Courses', icon: BookOpen },
-  { to: '/admin/users', label: 'Scholars & Mentors', icon: UsersRound },
+  { to: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { to: '/admin/courses', label: 'Learning Management', icon: BookOpen },
+  { to: '/admin/users', label: 'Learner Management', icon: UsersRound },
   { to: '/admin/announcements', label: 'Announcements', icon: Megaphone },
-  { to: '/admin/reports', label: 'Reports', icon: FileBarChart },
-  { to: '/admin/profile', label: 'Profile', icon: UserRound },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 
@@ -45,8 +35,8 @@ type SidebarProps = { isOpen?: boolean; onClose?: () => void; collapsed?: boolea
 export function Sidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse }: SidebarProps) {
   const { role, logout } = useAuth()
   const navigate = useNavigate()
-  const links = role === 'mentor' ? mentorLinks : role === 'admin' ? adminLinks : role === 'graduate' ? graduateLinks : scholarLinks
-  const home = role === 'mentor' ? '/mentor/dashboard' : role === 'admin' ? '/admin/dashboard' : role === 'graduate' ? '/graduate/dashboard' : '/home'
+  const links = role === 'mentor' ? mentorLinks : role === 'admin' ? adminLinks : scholarLinks
+  const home = role === 'mentor' ? '/mentor/dashboard' : role === 'admin' ? '/admin/dashboard' : '/home'
   const cls = `sidebar ${isOpen ? 'open' : ''} ${collapsed ? 'collapsed' : ''}`.trim()
 
   return <aside className={cls} aria-hidden={!isOpen && typeof window !== 'undefined' && window.innerWidth < 720}>
@@ -59,7 +49,7 @@ export function Sidebar({ isOpen = false, onClose, collapsed = false, onToggleCo
       </div>
       <Link to={home} className="brand-block" aria-label="Go to dashboard">
         <div className="brand-icon"><img src={logo} alt="" /></div>
-        {!collapsed && <div><p className="brand-title">Songa Academy</p><p className="brand-subtitle">Learning platform</p></div>}
+        {!collapsed && <div><p className="brand-title">Songa Scholars</p><p className="brand-subtitle">Foundation Platform</p></div>}
       </Link>
       <nav className="nav-list">
         {links.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} title={label} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => onClose?.()}>

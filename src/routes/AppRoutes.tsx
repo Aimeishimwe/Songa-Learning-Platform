@@ -23,29 +23,26 @@ const AnnouncementsPage = lazy(() => import('../pages/AnnouncementsPage').then(m
 const ScholarAssignmentsPage = lazy(() => import('../pages/ScholarAssignmentsPage').then(m => ({ default: m.ScholarAssignmentsPage })))
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then(m => ({ default: m.ProfilePage })))
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })))
-const GraduateDashboardPage = lazy(() => import('../pages/GraduateDashboardPage').then(m => ({ default: m.GraduateDashboardPage })))
 const MentorDashboardPage = lazy(() => import('../pages/MentorDashboardPage').then(m => ({ default: m.MentorDashboardPage })))
-const MentorCohortsPage = lazy(() => import('../pages/MentorCohortsPage').then(m => ({ default: m.MentorCohortsPage })))
 const MentorAssignmentsPage = lazy(() => import('../pages/MentorAssignmentsPage').then(m => ({ default: m.MentorAssignmentsPage })))
 const AdminDashboardPage = lazy(() => import('../pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })))
 const AdminProgramsPage = lazy(() => import('../pages/AdminProgramsPage').then(m => ({ default: m.AdminProgramsPage })))
 const AdminCoursesPage = lazy(() => import('../pages/AdminCoursesPage').then(m => ({ default: m.AdminCoursesPage })))
 const AdminUsersPage = lazy(() => import('../pages/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })))
-const AdminReportsPage = lazy(() => import('../pages/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })))
 const AdminAnnouncementsPage = lazy(() => import('../pages/AdminAnnouncementsPage').then(m => ({ default: m.AdminAnnouncementsPage })))
 
-function ProtectedRoute({ children, allowedRoles }: { children: ReactElement; allowedRoles: Array<'scholar' | 'graduate' | 'mentor' | 'admin'> }) {
+function ProtectedRoute({ children, allowedRoles }: { children: ReactElement; allowedRoles: Array<'scholar' | 'mentor' | 'admin'> }) {
   const { user, role } = useAuth()
 
   if (!user) {
     return <Navigate to="/login" replace />
   }
 
-  if (allowedRoles.includes(role as 'scholar' | 'graduate' | 'mentor' | 'admin')) {
+  if (allowedRoles.includes(role as 'scholar' | 'mentor' | 'admin')) {
     return children
   }
 
-  const homeByRole = { scholar: '/home', graduate: '/graduate/dashboard', mentor: '/mentor/dashboard', admin: '/admin/dashboard' } as const
+  const homeByRole = { scholar: '/home', mentor: '/mentor/dashboard', admin: '/admin/dashboard' } as const
   return <Navigate to={homeByRole[role as keyof typeof homeByRole] ?? '/login'} replace />
 }
 
@@ -73,15 +70,8 @@ export function AppRoutes() {
         <Route path="/settings" element={<ProtectedRoute allowedRoles={['scholar']}><SettingsPage /></ProtectedRoute>} />
       </Route>
 
-      <Route element={<ScholarLayout />}>
-        <Route path="/graduate/dashboard" element={<ProtectedRoute allowedRoles={['graduate']}><GraduateDashboardPage /></ProtectedRoute>} />
-        <Route path="/graduate/profile" element={<ProtectedRoute allowedRoles={['graduate']}><ProfilePage /></ProtectedRoute>} />
-        <Route path="/graduate/settings" element={<ProtectedRoute allowedRoles={['graduate']}><SettingsPage /></ProtectedRoute>} />
-      </Route>
-
       <Route element={<MentorLayout />}>
         <Route path="/mentor/dashboard" element={<ProtectedRoute allowedRoles={['mentor']}><MentorDashboardPage /></ProtectedRoute>} />
-        <Route path="/mentor/cohorts" element={<ProtectedRoute allowedRoles={['mentor']}><MentorCohortsPage /></ProtectedRoute>} />
         <Route path="/mentor/assignments" element={<ProtectedRoute allowedRoles={['mentor']}><MentorAssignmentsPage /></ProtectedRoute>} />
         <Route path="/mentor/profile" element={<ProtectedRoute allowedRoles={['mentor']}><ProfilePage /></ProtectedRoute>} />
         <Route path="/mentor/settings" element={<ProtectedRoute allowedRoles={['mentor']}><SettingsPage /></ProtectedRoute>} />
@@ -92,7 +82,6 @@ export function AppRoutes() {
         <Route path="/admin/programs" element={<ProtectedRoute allowedRoles={['admin']}><AdminProgramsPage /></ProtectedRoute>} />
         <Route path="/admin/courses" element={<ProtectedRoute allowedRoles={['admin']}><AdminCoursesPage /></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsersPage /></ProtectedRoute>} />
-        <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><AdminReportsPage /></ProtectedRoute>} />
         <Route path="/admin/announcements" element={<ProtectedRoute allowedRoles={['admin']}><AdminAnnouncementsPage /></ProtectedRoute>} />
         <Route path="/admin/profile" element={<ProtectedRoute allowedRoles={['admin']}><ProfilePage /></ProtectedRoute>} />
         <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><SettingsPage /></ProtectedRoute>} />
